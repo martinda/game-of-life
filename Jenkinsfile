@@ -15,9 +15,14 @@ pipeline{
             sourceFile: 'gameoflife-web/target/gameoflife.war', storageClass: 'STANDARD', uploadFromSlave: true, useServerSideEncryption: false]], 
             profileName: 'cjp-tower-demo', userMetadata: []])
       }
+      stage ('Input'){
+        script{
+            env.ENV = input message: 'Deploy Application?', ok: 'Go! Go! Go!', parameters: [choice(choices: 'Development\nStaging\nProduction', description: 'Pick Environment to Deploy.', name: 'ENV')]
+        }
+      }
       stage("Run Playbook"){
          withTower(host:"https://104.198.10.204", credentials:"tower-cli"){
-         sh 'tower-cli job launch --job-template=31'
+            sh 'tower-cli job launch --job-template=31 --extra-vars="env = $env.ENV"
          }
       }   
    }
