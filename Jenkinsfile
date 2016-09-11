@@ -21,15 +21,11 @@ pipeline{
    stages {
       stage('Build and Package'){
          sh "mvn clean package"
-         checkpoint "Build and Package"
       }
       stage ('Publish to S3'){
-         step([$class: 'S3BucketPublisher', dontWaitForConcurrentBuildCompletion: false, 
-            entries: [[bucket: 'cjptower', excludedFile: '', flatten: false, gzipFiles: false, keepForever: false, 
-            managedArtifacts: false, noUploadOnFailure: true, selectedRegion: 'us-west-2', showDirectlyInBrowser: false, 
-            sourceFile: 'gameoflife-web/target/gameoflife.war', storageClass: 'STANDARD', uploadFromSlave: true, useServerSideEncryption: false]], 
-            profileName: 'cjp-tower-demo', userMetadata: []])
-         checkpoint "Publish to S3"
+        wrap([$class: 'AmazonAwsCliBuildWrapper', credentialsId: 's3-cjptower', defaultRegion: 'us-west-2']) {
+            sh 'aws s3 cp gameoflife-web/target/gameoflife.war s3://cjptower/gameoflife.war'
+        }
       }
       stage ('Input'){
         script{
