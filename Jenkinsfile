@@ -1,19 +1,20 @@
-@Library("github.com/pwolf/pipeline") _
+@Library("github.com/pwolfbees/pipeline") _
 
-node ('linux') {
-   stage('Build'){
-    checkout scm
-    def mvnHome = tool 'M3.0.5-linux'
-    sh "${mvnHome}/bin/mvn clean install"
+pipeline{
+   agent docker:pwolf/cjptower
+
+   stages {
+      stage('Build'){
+         checkout scm
+         sh "${mvnHome}/bin/mvn clean package"
+      }
+      stage ('Archive'){
+         archiveArtifacts artifacts: 'gameoflife-web/target/gameoflife.war', excludes: null, onlyIfSuccessful: true
+      }
+      stage("Deploy"){
+         withTower(host:"https://104.198.10.204", credentials:"tower-cli"){
+         sh 'tower-cli job launch --job-template=31'
+         }
+      }   
    }
-   
-   stage ('Archive'){
-    archive 'gameoflife-web\\target\\gameoflife.war'
-   }
-   
-    stage("Deploy"){
-        withTower(host:"https://104.198.10.204", credentials:"tower-cli"){
-        sh 'tower-cli job launch --job-template=31'
-        }
-    }   
 }
