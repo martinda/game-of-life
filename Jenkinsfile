@@ -22,7 +22,7 @@ pipeline{
       }
       stage("Run Playbook"){
          withTower(host:"https://104.198.10.204", credentials:"tower-cli"){
-            sh 'tower-cli job launch --job-template=31 --extra-vars="env = $env.ENV"
+            sh "tower-cli job launch --job-template=31 --extra-vars='env='${env.ENV}"
          }
       }   
    }
