@@ -2,11 +2,26 @@
 
 pipeline{
    agent docker:'pwolf/cjptower'
+   
+   notifications {
+        always {
+            echo "Job's Done."
+        }
+        success {
+            echo "Success!!!"
+        }
+        failure {
+            echo "I FAILED."
+        }
+        changed {
+            echo "Things were different before..."
+        }
+    }
 
    stages {
       stage('Build and Package'){
          sh "mvn clean package"
-         checkpoint "Commit and Package"
+         checkpoint "Build and Package"
       }
       stage ('Publish to S3'){
          step([$class: 'S3BucketPublisher', dontWaitForConcurrentBuildCompletion: false, 
@@ -14,6 +29,7 @@ pipeline{
             managedArtifacts: false, noUploadOnFailure: true, selectedRegion: 'us-west-2', showDirectlyInBrowser: false, 
             sourceFile: 'gameoflife-web/target/gameoflife.war', storageClass: 'STANDARD', uploadFromSlave: true, useServerSideEncryption: false]], 
             profileName: 'cjp-tower-demo', userMetadata: []])
+         checkpoint "Publish to S3"
       }
       stage ('Input'){
         script{
