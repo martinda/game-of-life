@@ -5,7 +5,6 @@ pipeline{
 
    stages {
       stage('Build'){
-         checkout scm
          sh "${mvnHome}/bin/mvn clean package"
       }
       stage ('Archive'){
