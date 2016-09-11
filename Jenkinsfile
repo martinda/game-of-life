@@ -5,7 +5,7 @@ pipeline{
 
    stages {
       stage('Build'){
-         sh "${mvnHome}/bin/mvn clean package"
+         sh "mvn clean package"
       }
       stage ('Archive'){
          archiveArtifacts artifacts: 'gameoflife-web/target/gameoflife.war', excludes: null, onlyIfSuccessful: true
