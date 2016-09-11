@@ -1,4 +1,4 @@
-@Library("github.com/patrickdummy/pipeline") _
+@Library("github.com/pwolf/pipeline") _
 
 node ('linux') {
    stage('Build'){
