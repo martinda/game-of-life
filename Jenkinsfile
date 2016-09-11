@@ -6,6 +6,7 @@ pipeline{
    stages {
       stage('Build'){
          sh "mvn clean package"
+         checkpoint "Commit and Package"
       }
       stage ('Archive'){
          archiveArtifacts artifacts: 'gameoflife-web/target/gameoflife.war', excludes: null, onlyIfSuccessful: true
