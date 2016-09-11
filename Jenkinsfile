@@ -1,7 +1,7 @@
 @Library("github.com/pwolfbees/pipeline") _
 
 pipeline{
-   agent docker:pwolf/cjptower
+   agent docker:'pwolf/cjptower'
 
    stages {
       stage('Build'){
