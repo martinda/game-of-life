@@ -4,17 +4,17 @@ pipeline{
    agent docker:'pwolf/cjptower'
    
    notifications {
-        always {
-            echo "Job's Done."
-        }
         success {
-            echo "Success!!!"
+            mail to:"devops@example.com", subject:"SUCCESS: ${currentBuild.fullDisplayName}", body: "Build passed."
         }
         failure {
-            echo "I FAILED."
+            mail to:"devops@example.com", subject:"FAILURE: ${currentBuild.fullDisplayName}", body: "Build failed."
+        }
+        unstable {
+            mail to:"devops@example.com", subject:"UNSTABLE: ${currentBuild.fullDisplayName}", body: "Build unstable."
         }
         changed {
-            echo "Things were different before..."
+            mail to:"devops@example.com", subject:"CHANGED: ${currentBuild.fullDisplayName}", body: "Build status changed!"
         }
     }
 
@@ -22,17 +22,17 @@ pipeline{
       stage('Build and Package'){
          sh "mvn clean package"
       }
-      stage ('Publish to S3'){
+      stage ('Publish Artifact to S3'){
         wrap([$class: 'AmazonAwsCliBuildWrapper', credentialsId: 's3-cjptower', defaultRegion: 'us-west-2']) {
             sh 'aws s3 cp gameoflife-web/target/gameoflife.war s3://cjptower/gameoflife.war'
         }
       }
-      stage ('Input'){
+      stage ('Promote Build'){
         script{
-            env.ENV = input message: 'Deploy Application?', ok: 'Go! Go! Go!', parameters: [choice(choices: 'Development\nStaging\nProduction', description: 'Pick Environment to Deploy.', name: 'ENV')]
+            env.TARGET = input message: 'Deploy Application?', ok: 'Go! Go! Go!', parameters: [choice(choices: 'Development\nStaging\nProduction', description: 'Pick Target Environment for Deployment.', name: 'TARGET')]
         }
       }
-      stage("Run Playbook"){
+      stage("Run Tower Playbook"){
          withTower(host:"https://104.198.10.204", credentials:"tower-cli"){
             sh "tower-cli job launch --job-template=31 --extra-vars='env='${env.ENV}"
          }
