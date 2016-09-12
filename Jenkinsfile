@@ -5,7 +5,7 @@ pipeline{
    
    notifications {
         success {
-            mail to:"devops@example.com", subject:"SUCCESS: ${currentBuild.fullDisplayName}", body: "Build passed."
+            echo "SUCCESS: ${currentBuild.fullDisplayName}"
         }
         failure {
             mail to:"devops@example.com", subject:"FAILURE: ${currentBuild.fullDisplayName}", body: "Build failed."
