@@ -8,7 +8,7 @@ pipeline{
             echo "SUCCESS: ${currentBuild.fullDisplayName}"
         }
         failure {
-            echo :"FAILURE: ${currentBuild.fullDisplayName}"
+            echo "FAILURE: ${currentBuild.fullDisplayName}"
         }
         unstable {
             mail to:"devops@example.com", subject:"UNSTABLE: ${currentBuild.fullDisplayName}", body: "Build unstable."
